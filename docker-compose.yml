@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  # === MAIN API ===
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      - CHROMA_HOST=vectordb
+      - REDIS_URL=redis://redis:6379
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=alphaedge-api
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=otlp
+    depends_on:
+      vectordb:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    volumes:
+      - ./data:/app/data
+    networks:
+      - alphaedge
+    restart: unless-stopped
+
+  # === FRONTEND ===
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+    networks:
+      - alphaedge
+    restart: unless-stopped
+
+  # === VECTOR DATABASE ===
+  vectordb:
+    image: chromadb/chroma:0.4.22
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=false
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - alphaedge
+    restart: unless-stopped
+
+  # === REDIS (Caching & Rate Limiting) ===
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - alphaedge
+    restart: unless-stopped
+
+  # === OPENTELEMETRY COLLECTOR ===
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.91.0
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8888:8888"   # Metrics endpoint
+      - "8889:8889"   # Prometheus exporter
+    volumes:
+      - ./config/otel-collector.yaml:/etc/otelcol-contrib/config.yaml
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    depends_on:
+      - jaeger
+      - prometheus
+    networks:
+      - alphaedge
+    restart: unless-stopped
+
+  # === JAEGER (Distributed Tracing) ===
+  jaeger:
+    image: jaegertracing/all-in-one:1.52
+    ports:
+      - "16686:16686"  # UI
+      - "14268:14268"  # HTTP collector
+      - "14250:14250"  # gRPC
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - alphaedge
+    restart: unless-stopped
+
+  # === PROMETHEUS (Metrics) ===
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    networks:
+      - alphaedge
+    restart: unless-stopped
+
+  # === GRAFANA (Dashboards) ===
+  grafana:
+    image: grafana/grafana:10.2.2
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+      - jaeger
+    networks:
+      - alphaedge
+    restart: unless-stopped
+
+networks:
+  alphaedge:
+    driver: bridge
+
+volumes:
+  chroma-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:

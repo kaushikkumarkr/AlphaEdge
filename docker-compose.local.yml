@@ -1,0 +1,50 @@
+version: '3.8'
+
+# Lightweight local development setup with Arize Phoenix
+# Start with: docker compose -f docker-compose.local.yml up -d
+
+services:
+  # === ARIZE PHOENIX (LLM Observability) ===
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    ports:
+      - "6006:6006"    # Phoenix UI
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+    environment:
+      - PHOENIX_WORKING_DIR=/data
+    volumes:
+      - phoenix-data:/data
+    restart: unless-stopped
+
+  # === VECTOR DATABASE ===
+  vectordb:
+    image: chromadb/chroma:0.5.23
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=false
+      - IS_PERSISTENT=TRUE
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # === REDIS (Caching) ===
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+volumes:
+  phoenix-data:
+  chroma-data:
+  redis-data:
