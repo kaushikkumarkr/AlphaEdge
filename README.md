@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 AlphaEdge
+# AlphaEdge
 
 ### AI-Powered Multi-Agent Financial Research Platform
 
@@ -12,31 +12,31 @@
 
 **Enterprise-grade multi-agent AI system for comprehensive market research, investment analysis, and financial intelligence.**
 
-[Features](#-features) • [Architecture](#-system-architecture) • [Quick Start](#-quick-start) • [API Reference](#-api-reference) • [Contributing](#-contributing)
+[Features](#features) • [Architecture](#system-architecture) • [Quick Start](#quick-start) • [API Reference](#api-reference) • [Contributing](#contributing)
 
 ---
 
 </div>
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [Overview](#-overview)
-- [Features](#-features)
-- [System Architecture](#-system-architecture)
-- [Tech Stack](#-tech-stack)
-- [Quick Start](#-quick-start)
-- [Configuration](#-configuration)
-- [Usage](#-usage)
-- [API Reference](#-api-reference)
-- [Observability](#-observability)
-- [Testing](#-testing)
-- [Project Structure](#-project-structure)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Overview](#overview)
+- [Features](#features)
+- [System Architecture](#system-architecture)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [API Reference](#api-reference)
+- [Observability](#observability)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
-## 🎯 Overview
+## Overview
 
 AlphaEdge is a production-ready **multi-agent AI system** that orchestrates specialized agents to retrieve, analyze, and synthesize financial information from multiple authoritative sources. Built with modern AI/ML best practices, it provides institutional-grade market research capabilities.
 
@@ -52,9 +52,9 @@ AlphaEdge is a production-ready **multi-agent AI system** that orchestrates spec
 
 ---
 
-## ✨ Features
+## Features
 
-### 🤖 Multi-Agent Intelligence
+### Multi-Agent Intelligence
 
 | Agent | Data Source | Capabilities |
 |-------|-------------|--------------|
@@ -62,7 +62,7 @@ AlphaEdge is a production-ready **multi-agent AI system** that orchestrates spec
 | **OpenBB Agent** | OpenBB Platform | Real-time quotes, fundamentals, estimates, ownership |
 | **FRED Agent** | Federal Reserve | GDP, CPI, unemployment, interest rates, money supply |
 
-### 🔄 Intelligent Orchestration
+### Intelligent Orchestration
 
 - **Intent Classification**: Automatic query categorization (SEC/Financials/Macro/Synthesis)
 - **Complexity Detection**: Identifies complex queries requiring multi-task decomposition
@@ -72,21 +72,21 @@ AlphaEdge is a production-ready **multi-agent AI system** that orchestrates spec
 - **Result Synthesis**: Combines multi-source data into coherent insights
 - **State Management**: Conversation memory with checkpointing
 
-### 🛡️ Enterprise Guardrails
+### Enterprise Guardrails
 
 - **Faithfulness Scoring**: Validates LLM responses against source documents
 - **Citation Validation**: Every claim backed by verifiable sources
 - **Confidence Metrics**: Quantified reliability scores per response
 - **Input Validation**: Pydantic schemas for request/response validation
 
-### 📊 Full Observability
+### Full Observability
 
 - **Arize Phoenix**: LLM-specific tracing with OpenInference semantics
 - **OpenTelemetry**: Distributed tracing across all components
 - **Metrics Export**: Prometheus-compatible metrics endpoint
 - **Span Attributes**: Token counts, latency, model details, retrieval scores
 
-### 🍎 Local-First AI
+### Local-First AI
 
 - **MLX Support**: Apple Silicon optimized inference with MLX-LM
 - **Quantized Models**: 4-bit models for 16GB RAM MacBooks
@@ -94,227 +94,187 @@ AlphaEdge is a production-ready **multi-agent AI system** that orchestrates spec
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### High-Level Architecture
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor':'#ffffff', 'primaryBorderColor':'#333333', 'primaryBkg':'#ffffff', 'primaryTextColor':'#000000', 'background':'#ffffff', 'mainBkg':'#ffffff', 'secondBkg':'#ffffff', 'clusterBkg':'#ffffff', 'clusterBorder':'#333333', 'lineColor':'#333333', 'edgeLabelBackground':'#ffffff'}, 'darkMode': false}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor':'#f8f9fa', 'primaryTextColor':'#212529', 'primaryBorderColor':'#495057', 'lineColor':'#495057', 'secondaryColor':'#e9ecef', 'tertiaryColor':'#dee2e6', 'background':'#ffffff', 'mainBkg':'#ffffff', 'secondBkg':'#f8f9fa', 'clusterBkg':'#f8f9fa', 'clusterBorder':'#495057', 'edgeLabelBackground':'#ffffff', 'nodeTextColor':'#212529'}, 'flowchart': {'htmlLabels': true, 'curve': 'basis'}}}%%
 graph TB
-    subgraph CLIENT["🖥️ CLIENT LAYER"]
+    subgraph CLIENT["CLIENT LAYER"]
         UI[Streamlit UI<br/>Port 8501]
         REST[REST Client]
         CLI[CLI Tool]
     end
-    
-    subgraph API["🌐 API LAYER"]
+
+    subgraph API["API LAYER"]
         FastAPI[FastAPI Application<br/>Port 8000]
-        
+
         subgraph Endpoints
             Query[POST /query]
             Health[GET /health]
             Metrics[GET /metrics]
         end
-        
+
         OTEL[OpenTelemetry<br/>Instrumentation]
     end
-    
-    subgraph ORCHESTRATION["⚙️ ORCHESTRATION LAYER"]
+
+    subgraph ORCHESTRATION["ORCHESTRATION LAYER"]
         LangGraph[LangGraph State Machine]
-        
+
         Classify[Classify Intent<br/>+ Complexity Detection<br/>LLM]
         Route{Route Decision}
-        
+
         subgraph SimplePath["Fast Path - Simple Queries"]
             DirectRoute[Direct Agent<br/>Routing]
         end
-        
+
         subgraph ComplexPath["Multi-Task Pipeline - Complex Queries"]
             Decompose[Query Decomposer<br/>LLM Task Generation]
             TaskExec[Task Executor<br/>Sequential Execution]
             Synthesize[Synthesis Agent<br/>Result Aggregation]
         end
-        
-        subgraph State["📦 AlphaEdgeState"]
+
+        subgraph State["AlphaEdgeState"]
             StateData["• query, intent, entities<br/>• is_complex, task_plan<br/>• task_results, citations<br/>• confidence_score"]
         end
     end
-    
-    subgraph AGENTS["🤖 AGENT LAYER"]
+
+    subgraph AGENTS["AGENT LAYER"]
         subgraph SEC["SEC RAG Agent"]
             SEC1[10-K/10-Q Analysis]
             SEC2[Risk Factors]
             SEC3[MD&A Sections]
             ChromaDB[(ChromaDB<br/>Vector Search)]
         end
-        
+
         subgraph OpenBB["OpenBB Agent"]
             OBB1[Stock Quotes]
             OBB2[Fundamentals]
             OBB3[12+ Endpoints]
             OBBSDK[OpenBB SDK<br/>REST/Python]
         end
-        
+
         subgraph FRED["FRED Agent"]
             FRED1[GDP/Unemployment]
             FRED2[Inflation/CPI]
             FRED3[Interest Rates]
             FREDAPI[FRED API<br/>REST]
         end
-        
+
         SynthesisAgent[Synthesis Agent<br/>Multi-Source Combining]
     end
-    
-    subgraph MODELS["🧠 MODEL LAYER"]
+
+    subgraph MODELS["MODEL LAYER"]
         subgraph LLM["LLM Providers"]
             MLX[MLX<br/>Qwen2.5-3B-4bit<br/>Local/Apple Silicon]
             OpenAI[OpenAI<br/>GPT-4o<br/>Cloud API]
             Anthropic[Anthropic<br/>Claude 3.5<br/>Cloud API]
         end
-        
+
         Embeddings[Embeddings<br/>all-MiniLM-L6-v2<br/>384 dimensions]
     end
-    
-    subgraph DATA["💾 DATA & STORAGE LAYER"]
+
+    subgraph DATA["DATA & STORAGE LAYER"]
         Chroma[(ChromaDB<br/>Port 8001<br/>SEC Filings)]
         Redis[(Redis<br/>Port 6379<br/>Cache)]
         EDGAR[SEC EDGAR<br/>External API<br/>10-K/10-Q/8-K]
     end
-    
-    subgraph OBSERVABILITY["📊 OBSERVABILITY LAYER"]
+
+    subgraph OBSERVABILITY["OBSERVABILITY LAYER"]
         Phoenix[Arize Phoenix<br/>Port 6006]
-        
+
         subgraph Traces
             LLMTrace[LLM Traces<br/>Prompts/Tokens]
             RetrTrace[Retrieval Traces<br/>Docs/Scores]
             EmbTrace[Embedding Traces<br/>Vectors/Latency]
             TaskTrace[Task Execution<br/>Multi-Agent Flow]
         end
-        
+
         OpenInference[OpenInference<br/>Semantic Conventions<br/>OTLP Export]
     end
-    
+
     UI --> FastAPI
     REST --> FastAPI
     CLI --> FastAPI
-    
+
     FastAPI --> Query
     FastAPI --> Health
     FastAPI --> Metrics
     FastAPI --> OTEL
-    
+
     OTEL -.-> Phoenix
-    
+
     FastAPI --> LangGraph
     LangGraph --> Classify
     Classify --> Route
-    
+
     Route -->|Simple Query| DirectRoute
     Route -->|Complex Query| Decompose
-    
+
     DirectRoute --> SEC
     DirectRoute --> OpenBB
     DirectRoute --> FRED
-    
+
     Decompose --> TaskExec
     TaskExec -->|Task 1| SEC
     TaskExec -->|Task 2| OpenBB
     TaskExec -->|Task 3| FRED
     TaskExec --> Synthesize
-    
+
     Synthesize --> SynthesisAgent
-    
+
     SEC1 --> ChromaDB
     SEC2 --> ChromaDB
     SEC3 --> ChromaDB
-    
+
     OBB1 --> OBBSDK
     OBB2 --> OBBSDK
     OBB3 --> OBBSDK
-    
+
     FRED1 --> FREDAPI
     FRED2 --> FREDAPI
     FRED3 --> FREDAPI
-    
+
     Classify -.-> MLX
     Classify -.-> OpenAI
     Decompose -.-> MLX
     TaskExec -.-> MLX
     SynthesisAgent -.-> MLX
-    
+
     ChromaDB -.-> Embeddings
-    
+
     SEC --> Chroma
     OBBSDK --> Redis
     EDGAR -.-> Chroma
-    
+
     Phoenix --> LLMTrace
     Phoenix --> RetrTrace
     Phoenix --> EmbTrace
     Phoenix --> TaskTrace
     Phoenix --> OpenInference
-    
-    style CLIENT fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
-    style API fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
-    style ORCHESTRATION fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
-    style AGENTS fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
-    style MODELS fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
-    style DATA fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
-    style OBSERVABILITY fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
-    style SimplePath fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
-    style ComplexPath fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
-    
-    style FastAPI fill:#ff9800,color:#fff,font-weight:bold
-    style LangGraph fill:#9c27b0,color:#fff,font-weight:bold
-    style Phoenix fill:#00bcd4,color:#fff,font-weight:bold
-    style Route fill:#f44336,color:#fff,font-weight:bold
-    style Decompose fill:#ff5722,color:#fff,font-weight:bold
-```
 
-### Data Flow Sequence
+    style CLIENT fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
+    style API fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
+    style ORCHESTRATION fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
+    style AGENTS fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
+    style MODELS fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
+    style DATA fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
+    style OBSERVABILITY fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
+    style SimplePath fill:#ffffff,stroke:#6c757d,stroke-width:1px,color:#212529
+    style ComplexPath fill:#ffffff,stroke:#6c757d,stroke-width:1px,color:#212529
 
-```
-┌──────┐     ┌──────┐     ┌─────────┐     ┌───────┐     ┌──────┐
-│Client│     │ API  │     │LangGraph│     │ Agent │     │ Data │
-└──┬───┘     └──┬───┘     └────┬────┘     └───┬───┘     └──┬───┘
-   │            │              │              │            │
-   │ POST /query│              │              │            │
-   │───────────▶│              │              │            │
-   │            │              │              │            │
-   │            │ invoke()     │              │            │
-   │            │─────────────▶│              │            │
-   │            │              │              │            │
-   │            │              │classify_intent            │
-   │            │              │─────────────▶│            │
-   │            │              │              │ LLM call   │
-   │            │              │              │───────────▶│
-   │            │              │              │◀───────────│
-   │            │              │◀─────────────│            │
-   │            │              │              │            │
-   │            │              │route_by_intent            │
-   │            │              │──────┐       │            │
-   │            │              │      │       │            │
-   │            │              │◀─────┘       │            │
-   │            │              │              │            │
-   │            │              │run_agent     │            │
-   │            │              │─────────────▶│            │
-   │            │              │              │ _retrieve  │
-   │            │              │              │───────────▶│
-   │            │              │              │◀───────────│
-   │            │              │              │ _generate  │
-   │            │              │              │───────────▶│
-   │            │              │              │◀───────────│
-   │            │              │◀─────────────│            │
-   │            │              │              │            │
-   │            │◀─────────────│              │            │
-   │            │              │              │            │
-   │◀───────────│              │              │            │
-   │  Response  │              │              │            │
+    style FastAPI fill:#fd7e14,color:#fff,stroke:#e55300
+    style LangGraph fill:#6f42c1,color:#fff,stroke:#5a32a3
+    style Phoenix fill:#17a2b8,color:#fff,stroke:#138496
+    style Route fill:#dc3545,color:#fff,stroke:#c82333
+    style Decompose fill:#e83e8c,color:#fff,stroke:#d31c70
 ```
 
 ### Data Flow Sequence
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor':'#f8f9fa', 'primaryTextColor':'#212529', 'primaryBorderColor':'#495057', 'lineColor':'#495057', 'background':'#ffffff', 'actorBkg':'#f8f9fa', 'actorBorder':'#495057', 'actorTextColor':'#212529', 'actorLineColor':'#495057', 'signalColor':'#495057', 'signalTextColor':'#212529', 'labelBoxBkgColor':'#f8f9fa', 'labelBoxBorderColor':'#495057', 'labelTextColor':'#212529', 'loopTextColor':'#212529', 'noteBorderColor':'#495057', 'noteBkgColor':'#fff3cd', 'noteTextColor':'#212529', 'activationBorderColor':'#495057', 'activationBkgColor':'#e9ecef', 'sequenceNumberColor':'#fff'}, 'sequence': {'mirrorActors': false}}}%%
 sequenceDiagram
     participant C as Client
     participant API as FastAPI
@@ -328,128 +288,120 @@ sequenceDiagram
     participant EXT as External APIs
     participant PHX as Phoenix
 
-    C->>API: POST /query<br/>{query: "What is AAPL P/E?"}
+    C->>API: POST /query {query: "What is AAPL P/E?"}
     activate API
-    
+
     API->>OTEL: Start Root Span
     OTEL->>PHX: Export Trace (OTLP)
-    
+
     API->>LG: Initialize AlphaEdgeState
     activate LG
-    
-    rect rgb(240, 240, 255)
+
+    rect rgba(240, 240, 255, 0.5)
         Note over LG,LLM: CLASSIFY INTENT NODE
         LG->>OTEL: Start LLM Span
-        LG->>LLM: Classify Intent<br/>Prompt + Query
+        LG->>LLM: Classify Intent Prompt + Query
         activate LLM
-        LLM-->>LG: intent="FINANCIALS"<br/>entities=["AAPL"]<br/>confidence=0.95
+        LLM-->>LG: intent="FINANCIALS" entities=["AAPL"] confidence=0.95
         deactivate LLM
-        LG->>OTEL: End LLM Span<br/>(tokens, latency)
+        LG->>OTEL: End LLM Span (tokens, latency)
     end
-    
-    rect rgb(255, 240, 240)
+
+    rect rgba(255, 240, 240, 0.5)
         Note over LG: ROUTE QUERY NODE
-        LG->>LG: Determine Agent<br/>Based on Intent
+        LG->>LG: Determine Agent Based on Intent
         Note over LG: Route to OpenBB Agent
     end
-    
-    rect rgb(240, 255, 240)
+
+    rect rgba(240, 255, 240, 0.5)
         Note over LG,OBB: EXECUTE AGENT NODE
         LG->>OTEL: Start Agent Span
-        LG->>OBB: Execute Query<br/>ticker="AAPL"<br/>metrics=["P/E"]
+        LG->>OBB: Execute Query ticker="AAPL" metrics=["P/E"]
         activate OBB
-        
+
         OBB->>OTEL: Start Retrieval Span
-        OBB->>EXT: OpenBB SDK<br/>GET /equity/fundamental
+        OBB->>EXT: OpenBB SDK GET /equity/fundamental
         activate EXT
         EXT-->>OBB: {pe_ratio: 33.45}
         deactivate EXT
         OBB->>OTEL: End Retrieval Span
-        
+
         OBB->>LLM: Format Response
         activate LLM
         LLM-->>OBB: "AAPL P/E ratio is 33.45"
         deactivate LLM
-        
+
         OBB-->>LG: openbb_results=<data>
         deactivate OBB
         LG->>OTEL: End Agent Span
     end
-    
-    rect rgb(255, 255, 240)
+
+    rect rgba(255, 255, 240, 0.5)
         Note over LG,LLM: SYNTHESIZE RESPONSE NODE
         LG->>OTEL: Start LLM Span
-        LG->>LLM: Generate Final Response<br/>+ Citations
+        LG->>LLM: Generate Final Response + Citations
         activate LLM
-        LLM-->>LG: final_response=<text><br/>confidence=0.97
+        LLM-->>LG: final_response=<text> confidence=0.97
         deactivate LLM
         LG->>OTEL: End LLM Span
     end
-    
-    LG-->>API: AlphaEdgeState<br/>(final_response)
+
+    LG-->>API: AlphaEdgeState (final_response)
     deactivate LG
-    
+
     API->>OTEL: End Root Span
     OTEL->>PHX: Export Complete Trace Tree
-    
-    API-->>C: 200 OK<br/>{response, confidence, citations}
+
+    API-->>C: 200 OK {response, confidence, citations}
     deactivate API
-    
-    Note over PHX: Trace Tree Available<br/>at localhost:6006
+
+    Note over PHX: Trace Tree Available at localhost:6006
 ```
 
 ### Agent Decision Tree
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor':'#ffffff', 'primaryBorderColor':'#333333', 'primaryBkg':'#ffffff', 'primaryTextColor':'#000000', 'background':'#ffffff', 'mainBkg':'#ffffff', 'secondBkg':'#ffffff', 'clusterBkg':'#ffffff', 'clusterBorder':'#333333', 'lineColor':'#333333', 'edgeLabelBackground':'#ffffff'}, 'darkMode': false}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor':'#f8f9fa', 'primaryTextColor':'#212529', 'primaryBorderColor':'#495057', 'lineColor':'#495057', 'secondaryColor':'#e9ecef', 'tertiaryColor':'#dee2e6', 'background':'#ffffff', 'mainBkg':'#ffffff', 'secondBkg':'#f8f9fa', 'clusterBkg':'#f8f9fa', 'clusterBorder':'#495057', 'edgeLabelBackground':'#ffffff', 'nodeTextColor':'#212529'}, 'flowchart': {'htmlLabels': true, 'curve': 'basis'}}}%%
 graph TD
     Start([User Query]) --> Classify[Intent Classification<br/>LLM-based]
-    
+
     Classify --> SEC[SEC RAG Agent]
     Classify --> OBB[OpenBB Agent]
     Classify --> FRED[FRED Agent]
     Classify --> Multi[Multi-Agent<br/>Synthesis]
-    
+
     SEC --> Vector[(ChromaDB<br/>Vector Search)]
-    
+
     OBB --> OBBSDK[OpenBB SDK<br/>REST API]
-    
+
     FRED --> FREDAPI[FRED REST API]
-    
+
     Multi --> SEC
     Multi --> OBB
     Multi --> FRED
-    
+
     Vector --> Synthesize[Response Synthesis<br/>LLM]
     OBBSDK --> Synthesize
     FREDAPI --> Synthesize
-    
+
     Synthesize --> Final[Final Response<br/>+ Citations<br/>+ Confidence]
-    
-    style Start fill:#e1f5ff,stroke:#333,stroke-width:2px,color:#000
-    style Classify fill:#fff3e0,stroke:#333,stroke-width:2px,color:#000
-    style SEC fill:#e8f5e9,stroke:#333,stroke-width:2px,color:#000
-    style OBB fill:#e8f5e9,stroke:#333,stroke-width:2px,color:#000
-    style FRED fill:#e8f5e9,stroke:#333,stroke-width:2px,color:#000
-    style Multi fill:#f3e5f5,stroke:#333,stroke-width:2px,color:#000
-    style Vector fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
-    style OBBSDK fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
-    style FREDAPI fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
-    style Synthesize fill:#fce4ec,stroke:#333,stroke-width:2px,color:#000
-    style Final fill:#e0f2f1,stroke:#333,stroke-width:2px,color:#000
-    style FRED fill:#e8f5e9,stroke:#333,stroke-width:2px,color:#000
-    style Multi fill:#f3e5f5,stroke:#333,stroke-width:2px,color:#000
-    style Vector fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
-    style OBBSDK fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
-    style FREDAPI fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
-    style Synthesize fill:#fce4ec,stroke:#333,stroke-width:2px,color:#000
-    style Final fill:#e0f2f1,stroke:#333,stroke-width:2px,color:#000
-    style Final fill:#e0f2f1
+
+    style Start fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#212529
+    style Classify fill:#fff8e1,stroke:#f9a825,stroke-width:2px,color:#212529
+    style SEC fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#212529
+    style OBB fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#212529
+    style FRED fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#212529
+    style Multi fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#212529
+    style Vector fill:#fffde7,stroke:#fbc02d,stroke-width:2px,color:#212529
+    style OBBSDK fill:#fffde7,stroke:#fbc02d,stroke-width:2px,color:#212529
+    style FREDAPI fill:#fffde7,stroke:#fbc02d,stroke-width:2px,color:#212529
+    style Synthesize fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#212529
+    style Final fill:#e0f2f1,stroke:#00796b,stroke-width:2px,color:#212529
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Core Framework
 
@@ -496,7 +448,7 @@ graph TD
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -555,7 +507,7 @@ docker compose up --build
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -607,7 +559,7 @@ retrieval:
 
 ---
 
-## 📖 Usage
+## Usage
 
 ### API Endpoints
 
@@ -654,7 +606,7 @@ curl -X POST http://localhost:8000/query \
 
 ---
 
-## 📊 Observability
+## Observability
 
 ### Arize Phoenix Dashboard
 
@@ -690,7 +642,7 @@ span.set_attribute("agent.confidence_score", 0.95)
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Run All Tests
 
@@ -720,7 +672,7 @@ python test_sprint8.py
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 alphaedge/
@@ -776,7 +728,7 @@ alphaedge/
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our contributing guidelines:
 
@@ -804,13 +756,13 @@ mypy src/
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [LangGraph](https://langchain-ai.github.io/langgraph/) for multi-agent orchestration
 - [OpenBB](https://openbb.co) for comprehensive financial data
@@ -821,8 +773,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Built with ❤️ for the financial AI community**
+**Built with passion for the financial AI community**
 
-[⬆ Back to Top](#-alphaedge)
+[Back to Top](#alphaedge)
 
 </div>
