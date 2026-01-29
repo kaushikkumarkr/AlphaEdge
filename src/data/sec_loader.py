@@ -13,8 +13,7 @@ logger = get_logger(__name__)
 
 class SECLoader:
     def __init__(self):
-        email = settings.sec_user_agent.split()[-1] if settings.sec_user_agent else "research@example.com"
-        self.downloader = Downloader("AlphaEdge", email)
+        self.downloader = Downloader()
         self.chunker = DocumentChunker()
         self.vector_store = get_vector_store()
     
@@ -27,7 +26,7 @@ class SECLoader:
         files = []
         for filing_type in filing_types:
             try:
-                self.downloader.get(filing_type, ticker, limit=limit)
+                self.downloader.get(filing_type, ticker, amount=limit)
                 # Find downloaded files
                 base = Path(f"sec-edgar-filings/{ticker}/{filing_type}")
                 if base.exists():

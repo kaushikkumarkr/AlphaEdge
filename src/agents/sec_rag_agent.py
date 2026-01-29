@@ -1,15 +1,21 @@
 import re
+import asyncio
 from typing import List, Dict, Tuple
 from src.agents.base_agent import BaseAgent
+from src.data.sec_loader import SECLoader
 from src.data.vector_store import get_vector_store
 from src.guardrails.schemas import RetrievedContext, Citation
 from src.config.constants import AgentName, RERANK_TOP_K
+from src.utils.logging import get_logger
 
 
 class SECRAGAgent(BaseAgent):
     def __init__(self, **kwargs):
         super().__init__(name=AgentName.SEC_RAG, **kwargs)
         self.vector_store = get_vector_store(use_http=False)
+        self.sec_loader = SECLoader()
+        self._ingested_tickers = set()
+        self._logger = get_logger(__name__)
     
     @property
     def system_prompt(self) -> str:
@@ -26,12 +32,25 @@ Rules:
         search_filters = {}
         if filters.get("ticker"):
             search_filters["ticker"] = filters["ticker"]
+        else:
+            extracted = self._extract_ticker_from_query(query)
+            if extracted:
+                search_filters["ticker"] = extracted
         
         results = self.vector_store.search(
             query=query,
             top_k=RERANK_TOP_K,
             filters=search_filters if search_filters else None
         )
+
+        if not results and search_filters.get("ticker"):
+            ticker = str(search_filters["ticker"]).upper().strip()
+            await self._ingest_on_demand(ticker)
+            results = self.vector_store.search(
+                query=query,
+                top_k=RERANK_TOP_K,
+                filters=search_filters
+            )
         
         return [
             RetrievedContext(
@@ -42,6 +61,25 @@ Rules:
             )
             for chunk, score in results
         ]
+
+    def _extract_ticker_from_query(self, query: str) -> str | None:
+        match = re.search(r"\(([A-Z]{1,5})\)", query.upper())
+        if match:
+            return match.group(1)
+        match = re.search(r"\$([A-Z]{1,5})\b", query.upper())
+        if match:
+            return match.group(1)
+        return None
+
+    async def _ingest_on_demand(self, ticker: str, limit: int = 3) -> None:
+        if not ticker or ticker in self._ingested_tickers:
+            return
+        self._ingested_tickers.add(ticker)
+        self._logger.info(f"On-demand SEC ingestion for {ticker} (limit={limit})")
+        try:
+            await asyncio.to_thread(self.sec_loader.ingest, ticker, limit)
+        except Exception as exc:
+            self._logger.error(f"On-demand SEC ingestion failed for {ticker}: {exc}")
     
     async def _generate(
         self,
