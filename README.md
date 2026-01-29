@@ -401,84 +401,49 @@ sequenceDiagram
 ### Agent Decision Tree
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor':'#ffffff', 'primaryBorderColor':'#333333', 'primaryBkg':'#ffffff', 'primaryTextColor':'#000000', 'background':'#ffffff', 'mainBkg':'#ffffff', 'secondBkg':'#ffffff', 'clusterBkg':'#ffffff', 'clusterBorder':'#333333', 'lineColor':'#333333', 'edgeLabelBackground':'#ffffff'}, 'darkMode': false}}%%
 graph TD
     Start([User Query]) --> Classify[Intent Classification<br/>LLM-based]
     
-    Classify --> |SEC_FILING| SEC[SEC RAG Agent]
-    Classify --> |FINANCIALS| OBB[OpenBB Agent]
-    Classify --> |MACRO| FRED[FRED Agent]
-    Classify --> |SYNTHESIS| Multi[Multi-Agent<br/>Parallel Execution]
+    Classify --> SEC[SEC RAG Agent]
+    Classify --> OBB[OpenBB Agent]
+    Classify --> FRED[FRED Agent]
+    Classify --> Multi[Multi-Agent<br/>Synthesis]
     
-    SEC --> SECActions{Query Type}
-    SECActions --> |"risk factors"| Risk[Risk Factor Analysis]
-    SECActions --> |"10-K filing"| TenK[10-K Document Retrieval]
-    SECActions --> |"revenue breakdown"| Revenue[Revenue Analysis]
-    SECActions --> |"MD&A"| MDA[Management Discussion]
+    SEC --> Vector[(ChromaDB<br/>Vector Search)]
     
-    Risk --> Vector[(ChromaDB<br/>Vector Search)]
-    TenK --> Vector
-    Revenue --> Vector
-    MDA --> Vector
+    OBB --> OBBSDK[OpenBB SDK<br/>REST API]
     
-    OBB --> OBBActions{Financial Data}
-    OBBActions --> |Stock Price| Quote[quote endpoint]
-    OBBActions --> |P/E Ratio| Metrics[metrics endpoint]
-    OBBActions --> |Income Statement| Income[income endpoint]
-    OBBActions --> |Balance Sheet| Balance[balance endpoint]
-    OBBActions --> |Cash Flow| CashFlow[cashflow endpoint]
-    OBBActions --> |Estimates| Estimates[estimates endpoint]
-    OBBActions --> |Ownership| Ownership[ownership endpoint]
-    OBBActions --> |Dividends| Dividends[dividends endpoint]
-    OBBActions --> |News| News[news endpoint]
-    OBBActions --> |Options| Options[options endpoint]
-    OBBActions --> |Historical| Historical[historical endpoint]
+    FRED --> FREDAPI[FRED REST API]
     
-    Quote --> OBBSDK[OpenBB SDK<br/>REST/Python]
-    Metrics --> OBBSDK
-    Income --> OBBSDK
-    Balance --> OBBSDK
-    CashFlow --> OBBSDK
-    Estimates --> OBBSDK
-    Ownership --> OBBSDK
-    Dividends --> OBBSDK
-    News --> OBBSDK
-    Options --> OBBSDK
-    Historical --> OBBSDK
-    
-    FRED --> FREDActions{Economic Indicator}
-    FREDActions --> |GDP Growth| GDP[GDP Series]
-    FREDActions --> |Unemployment| UNRATE[UNRATE Series]
-    FREDActions --> |Inflation| CPI[CPIAUCSL Series]
-    FREDActions --> |Interest Rates| FEDFUNDS[FEDFUNDS Series]
-    FREDActions --> |Money Supply| M2[M2 Series]
-    
-    GDP --> FREDAPI[FRED REST API]
-    UNRATE --> FREDAPI
-    CPI --> FREDAPI
-    FEDFUNDS --> FREDAPI
-    M2 --> FREDAPI
-    
-    Multi --> MultiExec[Execute Multiple Agents<br/>in Parallel]
-    MultiExec --> SEC
-    MultiExec --> OBB
-    MultiExec --> FRED
+    Multi --> SEC
+    Multi --> OBB
+    Multi --> FRED
     
     Vector --> Synthesize[Response Synthesis<br/>LLM]
     OBBSDK --> Synthesize
     FREDAPI --> Synthesize
     
-    Synthesize --> Final[Final Response<br/>+ Citations<br/>+ Confidence Score]
+    Synthesize --> Final[Final Response<br/>+ Citations<br/>+ Confidence]
     
-    style Start fill:#e1f5ff
-    style Classify fill:#fff3e0
-    style SEC fill:#e8f5e9
-    style OBB fill:#e8f5e9
-    style FRED fill:#e8f5e9
-    style Multi fill:#f3e5f5
-    style Vector fill:#fff9c4
-    style OBBSDK fill:#fff9c4
-    style FREDAPI fill:#fff9c4
-    style Synthesize fill:#fce4ec
+    style Start fill:#e1f5ff,stroke:#333,stroke-width:2px,color:#000
+    style Classify fill:#fff3e0,stroke:#333,stroke-width:2px,color:#000
+    style SEC fill:#e8f5e9,stroke:#333,stroke-width:2px,color:#000
+    style OBB fill:#e8f5e9,stroke:#333,stroke-width:2px,color:#000
+    style FRED fill:#e8f5e9,stroke:#333,stroke-width:2px,color:#000
+    style Multi fill:#f3e5f5,stroke:#333,stroke-width:2px,color:#000
+    style Vector fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
+    style OBBSDK fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
+    style FREDAPI fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
+    style Synthesize fill:#fce4ec,stroke:#333,stroke-width:2px,color:#000
+    style Final fill:#e0f2f1,stroke:#333,stroke-width:2px,color:#000
+    style FRED fill:#e8f5e9,stroke:#333,stroke-width:2px,color:#000
+    style Multi fill:#f3e5f5,stroke:#333,stroke-width:2px,color:#000
+    style Vector fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
+    style OBBSDK fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
+    style FREDAPI fill:#fff9c4,stroke:#333,stroke-width:2px,color:#000
+    style Synthesize fill:#fce4ec,stroke:#333,stroke-width:2px,color:#000
+    style Final fill:#e0f2f1,stroke:#333,stroke-width:2px,color:#000
     style Final fill:#e0f2f1
 ```
 
