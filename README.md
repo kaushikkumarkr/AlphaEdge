@@ -99,7 +99,7 @@ AlphaEdge is a production-ready **multi-agent AI system** that orchestrates spec
 ### High-Level Architecture
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor':'#f8f9fa', 'primaryTextColor':'#212529', 'primaryBorderColor':'#495057', 'lineColor':'#495057', 'secondaryColor':'#e9ecef', 'tertiaryColor':'#dee2e6', 'background':'#ffffff', 'mainBkg':'#ffffff', 'secondBkg':'#f8f9fa', 'clusterBkg':'#f8f9fa', 'clusterBorder':'#495057', 'edgeLabelBackground':'#ffffff', 'nodeTextColor':'#212529'}, 'flowchart': {'htmlLabels': true, 'curve': 'basis'}}}%%
+%%{init: {'theme': 'neutral'}}%%
 graph TB
     subgraph CLIENT["CLIENT LAYER"]
         UI[Streamlit UI<br/>Port 8501]
@@ -254,27 +254,12 @@ graph TB
     Phoenix --> TaskTrace
     Phoenix --> OpenInference
 
-    style CLIENT fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
-    style API fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
-    style ORCHESTRATION fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
-    style AGENTS fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
-    style MODELS fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
-    style DATA fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
-    style OBSERVABILITY fill:#f8f9fa,stroke:#495057,stroke-width:2px,color:#212529
-    style SimplePath fill:#ffffff,stroke:#6c757d,stroke-width:1px,color:#212529
-    style ComplexPath fill:#ffffff,stroke:#6c757d,stroke-width:1px,color:#212529
-
-    style FastAPI fill:#fd7e14,color:#fff,stroke:#e55300
-    style LangGraph fill:#6f42c1,color:#fff,stroke:#5a32a3
-    style Phoenix fill:#17a2b8,color:#fff,stroke:#138496
-    style Route fill:#dc3545,color:#fff,stroke:#c82333
-    style Decompose fill:#e83e8c,color:#fff,stroke:#d31c70
 ```
 
 ### Data Flow Sequence
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor':'#f8f9fa', 'primaryTextColor':'#212529', 'primaryBorderColor':'#495057', 'lineColor':'#495057', 'background':'#ffffff', 'actorBkg':'#f8f9fa', 'actorBorder':'#495057', 'actorTextColor':'#212529', 'actorLineColor':'#495057', 'signalColor':'#495057', 'signalTextColor':'#212529', 'labelBoxBkgColor':'#f8f9fa', 'labelBoxBorderColor':'#495057', 'labelTextColor':'#212529', 'loopTextColor':'#212529', 'noteBorderColor':'#495057', 'noteBkgColor':'#fff3cd', 'noteTextColor':'#212529', 'activationBorderColor':'#495057', 'activationBkgColor':'#e9ecef', 'sequenceNumberColor':'#fff'}, 'sequence': {'mirrorActors': false}}}%%
+%%{init: {'theme': 'neutral'}}%%
 sequenceDiagram
     participant C as Client
     participant API as FastAPI
@@ -297,54 +282,46 @@ sequenceDiagram
     API->>LG: Initialize AlphaEdgeState
     activate LG
 
-    rect rgba(240, 240, 255, 0.5)
-        Note over LG,LLM: CLASSIFY INTENT NODE
-        LG->>OTEL: Start LLM Span
-        LG->>LLM: Classify Intent Prompt + Query
-        activate LLM
-        LLM-->>LG: intent="FINANCIALS" entities=["AAPL"] confidence=0.95
-        deactivate LLM
-        LG->>OTEL: End LLM Span (tokens, latency)
-    end
+    Note over LG,LLM: CLASSIFY INTENT NODE
+    LG->>OTEL: Start LLM Span
+    LG->>LLM: Classify Intent Prompt + Query
+    activate LLM
+    LLM-->>LG: intent="FINANCIALS" entities=["AAPL"] confidence=0.95
+    deactivate LLM
+    LG->>OTEL: End LLM Span (tokens, latency)
 
-    rect rgba(255, 240, 240, 0.5)
-        Note over LG: ROUTE QUERY NODE
-        LG->>LG: Determine Agent Based on Intent
-        Note over LG: Route to OpenBB Agent
-    end
+    Note over LG: ROUTE QUERY NODE
+    LG->>LG: Determine Agent Based on Intent
+    Note over LG: Route to OpenBB Agent
 
-    rect rgba(240, 255, 240, 0.5)
-        Note over LG,OBB: EXECUTE AGENT NODE
-        LG->>OTEL: Start Agent Span
-        LG->>OBB: Execute Query ticker="AAPL" metrics=["P/E"]
-        activate OBB
+    Note over LG,OBB: EXECUTE AGENT NODE
+    LG->>OTEL: Start Agent Span
+    LG->>OBB: Execute Query ticker="AAPL" metrics=["P/E"]
+    activate OBB
 
-        OBB->>OTEL: Start Retrieval Span
-        OBB->>EXT: OpenBB SDK GET /equity/fundamental
-        activate EXT
-        EXT-->>OBB: {pe_ratio: 33.45}
-        deactivate EXT
-        OBB->>OTEL: End Retrieval Span
+    OBB->>OTEL: Start Retrieval Span
+    OBB->>EXT: OpenBB SDK GET /equity/fundamental
+    activate EXT
+    EXT-->>OBB: {pe_ratio: 33.45}
+    deactivate EXT
+    OBB->>OTEL: End Retrieval Span
 
-        OBB->>LLM: Format Response
-        activate LLM
-        LLM-->>OBB: "AAPL P/E ratio is 33.45"
-        deactivate LLM
+    OBB->>LLM: Format Response
+    activate LLM
+    LLM-->>OBB: "AAPL P/E ratio is 33.45"
+    deactivate LLM
 
-        OBB-->>LG: openbb_results=<data>
-        deactivate OBB
-        LG->>OTEL: End Agent Span
-    end
+    OBB-->>LG: openbb_results
+    deactivate OBB
+    LG->>OTEL: End Agent Span
 
-    rect rgba(255, 255, 240, 0.5)
-        Note over LG,LLM: SYNTHESIZE RESPONSE NODE
-        LG->>OTEL: Start LLM Span
-        LG->>LLM: Generate Final Response + Citations
-        activate LLM
-        LLM-->>LG: final_response=<text> confidence=0.97
-        deactivate LLM
-        LG->>OTEL: End LLM Span
-    end
+    Note over LG,LLM: SYNTHESIZE RESPONSE NODE
+    LG->>OTEL: Start LLM Span
+    LG->>LLM: Generate Final Response + Citations
+    activate LLM
+    LLM-->>LG: final_response confidence=0.97
+    deactivate LLM
+    LG->>OTEL: End LLM Span
 
     LG-->>API: AlphaEdgeState (final_response)
     deactivate LG
@@ -361,7 +338,7 @@ sequenceDiagram
 ### Agent Decision Tree
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'primaryColor':'#f8f9fa', 'primaryTextColor':'#212529', 'primaryBorderColor':'#495057', 'lineColor':'#495057', 'secondaryColor':'#e9ecef', 'tertiaryColor':'#dee2e6', 'background':'#ffffff', 'mainBkg':'#ffffff', 'secondBkg':'#f8f9fa', 'clusterBkg':'#f8f9fa', 'clusterBorder':'#495057', 'edgeLabelBackground':'#ffffff', 'nodeTextColor':'#212529'}, 'flowchart': {'htmlLabels': true, 'curve': 'basis'}}}%%
+%%{init: {'theme': 'neutral'}}%%
 graph TD
     Start([User Query]) --> Classify[Intent Classification<br/>LLM-based]
 
@@ -385,18 +362,6 @@ graph TD
     FREDAPI --> Synthesize
 
     Synthesize --> Final[Final Response<br/>+ Citations<br/>+ Confidence]
-
-    style Start fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#212529
-    style Classify fill:#fff8e1,stroke:#f9a825,stroke-width:2px,color:#212529
-    style SEC fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#212529
-    style OBB fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#212529
-    style FRED fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#212529
-    style Multi fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#212529
-    style Vector fill:#fffde7,stroke:#fbc02d,stroke-width:2px,color:#212529
-    style OBBSDK fill:#fffde7,stroke:#fbc02d,stroke-width:2px,color:#212529
-    style FREDAPI fill:#fffde7,stroke:#fbc02d,stroke-width:2px,color:#212529
-    style Synthesize fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#212529
-    style Final fill:#e0f2f1,stroke:#00796b,stroke-width:2px,color:#212529
 ```
 
 ---
