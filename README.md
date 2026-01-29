@@ -99,7 +99,6 @@ AlphaEdge is a production-ready **multi-agent AI system** that orchestrates spec
 ### High-Level Architecture
 
 ```mermaid
-%%{init: {'theme': 'neutral'}}%%
 graph TB
     subgraph CLIENT["CLIENT LAYER"]
         UI[Streamlit UI<br/>Port 8501]
@@ -259,7 +258,6 @@ graph TB
 ### Data Flow Sequence
 
 ```mermaid
-%%{init: {'theme': 'neutral'}}%%
 sequenceDiagram
     participant C as Client
     participant API as FastAPI
@@ -338,7 +336,6 @@ sequenceDiagram
 ### Agent Decision Tree
 
 ```mermaid
-%%{init: {'theme': 'neutral'}}%%
 graph TD
     Start([User Query]) --> Classify[Intent Classification<br/>LLM-based]
 
