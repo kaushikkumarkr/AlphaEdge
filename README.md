@@ -65,9 +65,12 @@ AlphaEdge is a production-ready **multi-agent AI system** that orchestrates spec
 ### 🔄 Intelligent Orchestration
 
 - **Intent Classification**: Automatic query categorization (SEC/Financials/Macro/Synthesis)
+- **Complexity Detection**: Identifies complex queries requiring multi-task decomposition
+- **LLM-Based Decomposition**: Automatically breaks down complex queries into executable tasks
 - **Smart Routing**: Dynamic agent selection based on query intent
+- **Sequential Task Execution**: Dependency-aware task execution for stability
+- **Result Synthesis**: Combines multi-source data into coherent insights
 - **State Management**: Conversation memory with checkpointing
-- **Parallel Execution**: Concurrent agent calls for synthesis queries
 
 ### 🛡️ Enterprise Guardrails
 
@@ -118,12 +121,21 @@ graph TB
     subgraph ORCHESTRATION["⚙️ ORCHESTRATION LAYER"]
         LangGraph[LangGraph State Machine]
         
-        Classify[Classify Intent<br/>LLM]
-        Route[Route Query<br/>Logic]
-        Execute[Execute Agent<br/>Parallel]
+        Classify[Classify Intent<br/>+ Complexity Detection<br/>LLM]
+        Route{Route Decision}
+        
+        subgraph SimplePath["Fast Path - Simple Queries"]
+            DirectRoute[Direct Agent<br/>Routing]
+        end
+        
+        subgraph ComplexPath["Multi-Task Pipeline - Complex Queries"]
+            Decompose[Query Decomposer<br/>LLM Task Generation]
+            TaskExec[Task Executor<br/>Sequential Execution]
+            Synthesize[Synthesis Agent<br/>Result Aggregation]
+        end
         
         subgraph State["📦 AlphaEdgeState"]
-            StateData["• query, intent, entities<br/>• sec_results, openbb_results<br/>• fred_results, citations<br/>• confidence_score"]
+            StateData["• query, intent, entities<br/>• is_complex, task_plan<br/>• task_results, citations<br/>• confidence_score"]
         end
     end
     
@@ -148,6 +160,8 @@ graph TB
             FRED3[Interest Rates]
             FREDAPI[FRED API<br/>REST]
         end
+        
+        SynthesisAgent[Synthesis Agent<br/>Multi-Source Combining]
     end
     
     subgraph MODELS["🧠 MODEL LAYER"]
@@ -173,6 +187,7 @@ graph TB
             LLMTrace[LLM Traces<br/>Prompts/Tokens]
             RetrTrace[Retrieval Traces<br/>Docs/Scores]
             EmbTrace[Embedding Traces<br/>Vectors/Latency]
+            TaskTrace[Task Execution<br/>Multi-Agent Flow]
         end
         
         OpenInference[OpenInference<br/>Semantic Conventions<br/>OTLP Export]
@@ -192,11 +207,21 @@ graph TB
     FastAPI --> LangGraph
     LangGraph --> Classify
     Classify --> Route
-    Route --> Execute
     
-    Execute --> SEC
-    Execute --> OpenBB
-    Execute --> FRED
+    Route -->|Simple Query| DirectRoute
+    Route -->|Complex Query| Decompose
+    
+    DirectRoute --> SEC
+    DirectRoute --> OpenBB
+    DirectRoute --> FRED
+    
+    Decompose --> TaskExec
+    TaskExec -->|Task 1| SEC
+    TaskExec -->|Task 2| OpenBB
+    TaskExec -->|Task 3| FRED
+    TaskExec --> Synthesize
+    
+    Synthesize --> SynthesisAgent
     
     SEC1 --> ChromaDB
     SEC2 --> ChromaDB
@@ -212,8 +237,9 @@ graph TB
     
     Classify -.-> MLX
     Classify -.-> OpenAI
-    Execute -.-> MLX
-    Execute -.-> OpenAI
+    Decompose -.-> MLX
+    TaskExec -.-> MLX
+    SynthesisAgent -.-> MLX
     
     ChromaDB -.-> Embeddings
     
@@ -224,6 +250,7 @@ graph TB
     Phoenix --> LLMTrace
     Phoenix --> RetrTrace
     Phoenix --> EmbTrace
+    Phoenix --> TaskTrace
     Phoenix --> OpenInference
     
     style CLIENT fill:#e1f5ff
@@ -233,10 +260,14 @@ graph TB
     style MODELS fill:#fce4ec
     style DATA fill:#fff9c4
     style OBSERVABILITY fill:#e0f2f1
+    style SimplePath fill:#c8e6c9
+    style ComplexPath fill:#ffccbc
     
     style FastAPI fill:#ff9800,color:#fff
     style LangGraph fill:#9c27b0,color:#fff
     style Phoenix fill:#00bcd4,color:#fff
+    style Route fill:#f44336,color:#fff
+    style Decompose fill:#ff5722,color:#fff
 ```
 
 ### Data Flow Sequence
