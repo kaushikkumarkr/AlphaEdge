@@ -99,7 +99,7 @@ AlphaEdge is a production-ready **multi-agent AI system** that orchestrates spec
 ### High-Level Architecture
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor':'#ffffff', 'primaryBorderColor':'#333333', 'background':'#ffffff', 'mainBkg':'#ffffff', 'clusterBkg':'#ffffff', 'clusterBorder':'#333333', 'lineColor':'#333333', 'primaryTextColor':'#000000'}}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor':'#ffffff', 'primaryBorderColor':'#333333', 'primaryBkg':'#ffffff', 'primaryTextColor':'#000000', 'background':'#ffffff', 'mainBkg':'#ffffff', 'secondBkg':'#ffffff', 'clusterBkg':'#ffffff', 'clusterBorder':'#333333', 'lineColor':'#333333', 'edgeLabelBackground':'#ffffff'}, 'darkMode': false}}%%
 graph TB
     subgraph CLIENT["🖥️ CLIENT LAYER"]
         UI[Streamlit UI<br/>Port 8501]
