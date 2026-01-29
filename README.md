@@ -99,6 +99,7 @@ AlphaEdge is a production-ready **multi-agent AI system** that orchestrates spec
 ### High-Level Architecture
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor':'#ffffff', 'primaryBorderColor':'#333333', 'background':'#ffffff', 'mainBkg':'#ffffff', 'clusterBkg':'#ffffff', 'clusterBorder':'#333333', 'lineColor':'#333333', 'primaryTextColor':'#000000'}}}%%
 graph TB
     subgraph CLIENT["🖥️ CLIENT LAYER"]
         UI[Streamlit UI<br/>Port 8501]
@@ -253,21 +254,21 @@ graph TB
     Phoenix --> TaskTrace
     Phoenix --> OpenInference
     
-    style CLIENT fill:#e1f5ff
-    style API fill:#fff3e0
-    style ORCHESTRATION fill:#f3e5f5
-    style AGENTS fill:#e8f5e9
-    style MODELS fill:#fce4ec
-    style DATA fill:#fff9c4
-    style OBSERVABILITY fill:#e0f2f1
-    style SimplePath fill:#c8e6c9
-    style ComplexPath fill:#ffccbc
+    style CLIENT fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    style API fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    style ORCHESTRATION fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    style AGENTS fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    style MODELS fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    style DATA fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    style OBSERVABILITY fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    style SimplePath fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    style ComplexPath fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
     
-    style FastAPI fill:#ff9800,color:#fff
-    style LangGraph fill:#9c27b0,color:#fff
-    style Phoenix fill:#00bcd4,color:#fff
-    style Route fill:#f44336,color:#fff
-    style Decompose fill:#ff5722,color:#fff
+    style FastAPI fill:#ff9800,color:#fff,font-weight:bold
+    style LangGraph fill:#9c27b0,color:#fff,font-weight:bold
+    style Phoenix fill:#00bcd4,color:#fff,font-weight:bold
+    style Route fill:#f44336,color:#fff,font-weight:bold
+    style Decompose fill:#ff5722,color:#fff,font-weight:bold
 ```
 
 ### Data Flow Sequence
